@@ -1,0 +1,103 @@
+from machine import Pin , PWM
+import time 
+v=0
+r=0
+f=1
+p=1
+descargue=0
+nvueltas=3
+pasos=590
+cabinas=8
+
+grados=90
+y2=8000
+y1=1800
+x2=180
+x1=0
+formula=int(((y2-y1)/(x2-x1))*grados+1800)
+resultado=formula
+
+total_vueltas=pasos*nvueltas
+total_cabinas=pasos/cabinas
+
+tiempo_cabina=1
+tiempo=0.005
+pines_motor=[15,2,4,5]
+
+servo=PWM(Pin(13), freq=50)
+
+bonina = []
+servo.duty_u16(y1)
+def abrir_puerta():
+        servo.duty_u16(resultado)
+        time.sleep(1)
+        servo.duty_u16(y1)
+        time.sleep(1)
+    
+salida_a = Pin(15, Pin.OUT)
+salida_b=Pin(2,Pin.OUT)
+salida_c=Pin(4,Pin.OUT)
+salida_d=Pin(5,Pin.OUT)
+
+
+def giro():
+    time.sleep(tiempo)
+    
+    salida_a.value(1)
+    salida_b.value(0)
+    salida_c.value(0)
+    salida_d.value(0)
+
+    time.sleep(tiempo)
+     
+    salida_a.value(0)
+    salida_b.value(1)
+    salida_c.value(0)
+    salida_d.value(0)
+
+    time.sleep(tiempo)
+     
+    salida_a.value(0)
+    salida_b.value(0)
+    salida_c.value(1)
+    salida_d.value(0)
+
+    time.sleep(tiempo)
+     
+    salida_a.value(0)
+    salida_b.value(0)
+    salida_c.value(0)
+    salida_d.value(1)
+    
+def bucle():
+    v=0
+    while v<total_cabinas:
+        giro()
+        v=v+1
+def dar_vuelta():
+    p=0
+    while pasos > p:
+        giro()
+        p=p+1
+        
+while r<cabinas:
+    bucle()
+    r=r+1
+    abrir_puerta()
+    print("parada n:",r)
+    time.sleep(tiempo_cabina)
+    
+    
+while f<=nvueltas:
+    dar_vuelta()
+
+    print("vuelta n:",f)
+    f=f+1
+    
+while descargue<cabinas:
+    bucle()
+    abrir_puerta()
+    descargue=descargue+1
+    print("parada n:",descargue)
+    time.sleep(tiempo_cabina)
+    
